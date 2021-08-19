@@ -3,7 +3,7 @@ const utils = require("../../utils");
 const { isDepotStructure } = utils;
 
 const getEmptyDepots = (creep) => {
-  return creep.room.find(FIND_STRUCTURES, {
+  return creep.room.find(FIND_MY_STRUCTURES, {
     filter: (structure) => {
       return (
         isDepotStructure(structure) &&
@@ -14,7 +14,7 @@ const getEmptyDepots = (creep) => {
 };
 
 const getClosestNonEmptyStore = (creep) => {
-  const stores = creep.room.find(FIND_STRUCTURES, {
+  const stores = creep.room.find(FIND_MY_STRUCTURES, {
     filter: (structure) => {
       return (
         isDepotStructure(structure) &&
@@ -58,7 +58,7 @@ const bestSource = (creep) => {
 
 const getWallsToDig = (creep, source) => {
   const roomPosition = creep.room.getPositionAt(source.pos.x, source.pos.y);
-  const a = roomPosition.findInRange(FIND_STRUCTURES);
+  const a = roomPosition.findInRange(FIND_MY_STRUCTURES);
 
   return [];
   const positions = utils.getSquare(1).map((newPos) => {

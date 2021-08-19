@@ -15,7 +15,7 @@ const loop = function () {
   roles.worker.spawn();
   // const tower = Game.getObjectById('fede217bf67fd7953f15b64c');
   // if (tower) {
-  //   const closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+  //   const closestDamagedStructure = tower.pos.findClosestByRange(FIND_MY_STRUCTURES, {
   //     filter: (structure) => structure.hits < structure.hitsMax
   //   });
   //   if (closestDamagedStructure) {

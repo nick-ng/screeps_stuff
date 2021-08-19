@@ -12,7 +12,7 @@ const isDepotStructure = (structure) => {
 };
 
 const getEmptyDepots = (creep) => {
-  return creep.room.find(FIND_STRUCTURES, {
+  return creep.room.find(FIND_MY_STRUCTURES, {
     filter: (structure) => {
       return (
         isDepotStructure(structure) &&
@@ -41,14 +41,32 @@ const sortedSources = (creep) => {
 };
 
 const closestDepot = (creep) => {
-  const goals = creep.room.find(FIND_STRUCTURES, {
-    filter: (structure) => {
-      return (
-        isDepotStructure(structure) &&
-        structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-      );
-    },
-  });
+  const goals = creep.room
+    .find(FIND_MY_STRUCTURES, {
+      filter: (structure) => {
+        return (
+          isDepotStructure(structure) &&
+          structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+        );
+      },
+    })
+    .concat(
+      creep.room.find(FIND_MY_CREEPS, {
+        filter: (creep) => {
+          switch (creep.memory.role) {
+            case "builder":
+              return (
+                creep.room.find(FIND_CONSTRUCTION_SITES).length > 0 &&
+                creep.store.getFreeCapacity() > 0
+              );
+            case "upgrader":
+              return creep.store.getFreeCapacity() > 20;
+            default:
+              return false;
+          }
+        },
+      })
+    );
 
   const b = goals
     .map((goal) => {
@@ -112,7 +130,24 @@ const harvest = (creep) => {
       }
     }
 
-    if (creep.store.getFreeCapacity() > 0) {
+    if (!creep.memory.subTask) {
+      creep.memory.subTask = "delivering";
+    }
+
+    if (
+      creep.memory.subTask === "delivering" &&
+      creep.store[RESOURCE_ENERGY] === 0
+    ) {
+      creep.memory.subTask = "harvesting";
+    } else if (
+      creep.memory.subTask === "harvesting" &&
+      creep.store.getFreeCapacity() === 0
+    ) {
+      creep.memory.subTask = "delivering";
+    }
+
+    if (creep.memory.subTask === "harvesting") {
+      creep.say("h");
       // creep.say(creep.memory.source.id);
       const source0 = creep.room.find(FIND_SOURCES, {
         filter: (source) => source.id === creep.memory.source.id,
@@ -126,6 +161,7 @@ const harvest = (creep) => {
         creep.memory.task = NOTHING;
       }
     } else {
+      creep.say("d");
       const target0 = closestDepot(creep);
 
       if (target0) {

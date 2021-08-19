@@ -105,7 +105,7 @@ module.exports = {
     }
   },
   findStores: (creep) =>
-    creep.room.find(FIND_STRUCTURES, {
+    creep.room.find(FIND_MY_STRUCTURES, {
       filter: (structure) => {
         return (
           (structure.structureType == STRUCTURE_EXTENSION ||

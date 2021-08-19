@@ -9,6 +9,21 @@ var roleBuilder = {
     Object.values(Game.rooms).forEach((room) => {
       const targetsb = room.find(FIND_CONSTRUCTION_SITES);
       targets += targetsb.length;
+      const targetsc = room.find(FIND_MY_STRUCTURES, {
+        filter: (structure) => {
+          return structure.hitsMax - structure.hits > 0;
+        },
+      });
+      targets += targetsc.length;
+      const targetsd = room.find(FIND_STRUCTURES, {
+        filter: (structure) => {
+          return (
+            structure.structureType === "road" &&
+            structure.hitsMax - structure.hits > 0
+          );
+        },
+      });
+      targets += targetsd.length;
     });
 
     if (targets > 0) {
@@ -21,7 +36,6 @@ var roleBuilder = {
     // if (creep.room.energyAvailable <= 200 && !creep.memory.building) {
     //   return;
     // }
-    creep.say(creep.memory.building ? "🙂" : "🔄");
     if (creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
       creep.memory.building = false;
     }
@@ -32,11 +46,44 @@ var roleBuilder = {
     if (creep.memory.building) {
       const target0 = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
       if (target0) {
+        creep.say("🙂");
         if (creep.build(target0) == ERR_NOT_IN_RANGE) {
           creep.moveTo(target0, {
             visualizePathStyle: { stroke: "#ffffff" },
           });
         }
+        return;
+      }
+      const target1 = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+        filter: (structure) => {
+          return structure.hitsMax - structure.hits > 0;
+        },
+      });
+      if (target1) {
+        creep.say("😮");
+        if (creep.repair(target1) === ERR_NOT_IN_RANGE) {
+          creep.moveTo(target1, {
+            visualizePathStyle: { stroke: "#ffff00" },
+          });
+        }
+        return;
+      }
+      const target2 = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+        filter: (structure) => {
+          return (
+            structure.structureType === "road" &&
+            structure.hitsMax - structure.hits > 0
+          );
+        },
+      });
+      if (target2) {
+        creep.say("😮");
+        if (creep.repair(target2) === ERR_NOT_IN_RANGE) {
+          creep.moveTo(target2, {
+            visualizePathStyle: { stroke: "#ffff00" },
+          });
+        }
+        return;
       }
     } else {
       const storage = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
@@ -47,6 +94,7 @@ var roleBuilder = {
       if (!storage) {
         return;
       }
+      creep.say("🔄");
       if (creep.withdraw(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
         creep.moveTo(storage, { visualizePathStyle: { stroke: "#ffaa00" } });
       }
