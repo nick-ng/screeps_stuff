@@ -1,7 +1,6 @@
 const utils = require("../utils");
 
-const getFreeSquares = (room, sourcePos, options = {}) => {
-  const { swampClear } = options;
+const getFreeSquares = (room, sourcePos, swampClear = false) => {
   const positions = utils.getSquare(1).map((newPos) => {
     return { x: sourcePos.x + newPos.x, y: sourcePos.y + newPos.y };
   });
@@ -20,11 +19,12 @@ const getFreeSquares = (room, sourcePos, options = {}) => {
       return false;
     }
 
-    switch (terrain.get(position.x, position.y)) {
+    const terrainValue = terrain.get(position.x, position.y);
+    switch (terrainValue) {
       case TERRAIN_MASK_WALL:
         return false;
       case TERRAIN_MASK_SWAMP:
-        return false || swampClear;
+        return swampClear;
       case 0:
         break;
     }

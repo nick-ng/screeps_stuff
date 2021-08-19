@@ -17,11 +17,11 @@ var roleUpgrader = {
     }
     if (creep.memory.upgrading && creep.store[RESOURCE_ENERGY] == 0) {
       creep.memory.upgrading = false;
-      creep.say("🔄 harvest");
+      creep.say("🔄");
     }
     if (!creep.memory.upgrading && creep.store.getFreeCapacity() == 0) {
       creep.memory.upgrading = true;
-      creep.say("⚡ upgrade");
+      creep.say("⚡");
     }
 
     if (creep.memory.upgrading) {

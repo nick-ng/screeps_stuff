@@ -12,15 +12,16 @@ var roleBuilder = {
     });
 
     if (targets > 0) {
-      utils.spawn([WORK, CARRY, MOVE], ROLE_NAME, MIN_UNITS, {}, 0);
+      utils.spawn([WORK, CARRY, CARRY, MOVE], ROLE_NAME, MIN_UNITS, {}, 0);
     }
   },
   /** @param {Creep} creep **/
   run: function (creep) {
-    creep.say(`b ${creep.room.energyAvailable}`);
-    if (creep.room.energyAvailable <= 200 && !creep.memory.building) {
-      return;
-    }
+    // creep.say(`b ${creep.room.energyAvailable}`);
+    // if (creep.room.energyAvailable <= 200 && !creep.memory.building) {
+    //   return;
+    // }
+    creep.say(creep.memory.building ? "🙂" : "🔄");
     if (creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
       creep.memory.building = false;
     }
@@ -41,7 +42,7 @@ var roleBuilder = {
       const storage = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
         filter: (structure) =>
           utils.isDepotStructure(structure) &&
-          structure.store.getUsedCapacity(RESOURCE_ENERGY) > 20,
+          structure.store.getUsedCapacity(RESOURCE_ENERGY) > 0,
       });
       if (!storage) {
         return;

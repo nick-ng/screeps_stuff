@@ -1,20 +1,10 @@
 const utils = require("./utils");
 
-const buildExtension = (room) => {
-  const extensions = room.find(FIND_MY_STRUCTURES, {
-    filter: { structureType: STRUCTURE_EXTENSION },
-  });
-  const mySpawns = room.find(FIND_MY_SPAWNS);
-
-  const maxExtensions =
-    CONTROLLER_STRUCTURES[STRUCTURE_EXTENSION][room.controller.level];
-
-  // build roads
+const buildRoads = (room) => {
   const sources = room.find(FIND_SOURCES);
   const depots = room.find(FIND_MY_STRUCTURES, {
     filter: utils.isDepotStructure,
   });
-  // console.log("depots", depots);
   sources.forEach((source) => {
     const target = source.pos.findClosestByPath(depots.map((a) => a.pos));
 
@@ -25,17 +15,32 @@ const buildExtension = (room) => {
         plainCost: 1,
         swampCost: 1,
       });
-      // for (let i = 1; i < path.length; i++) {
-      //   room.visual.line(path[i].x, path[i].y, path[i - 1].x, path[i - 1].y);
-      // }
+
       path.forEach((a) => {
         const { x, y } = a;
-        if (utils.squareClear(a, room, { swampClear: true })) {
-          room.createConstructionSite(x, y, STRUCTURE_ROAD);
+
+        if (utils.squareClear(a, room, { swampClear: true, wallClear: true })) {
+          const result = room.createConstructionSite(x, y, STRUCTURE_ROAD);
+          if (![0, -7].includes(result)) {
+            room.visual.text(result, x, y);
+          }
         }
       });
     }
   });
+};
+
+const buildExtension = (room) => {
+  const extensions = room.find(FIND_MY_STRUCTURES, {
+    filter: { structureType: STRUCTURE_EXTENSION },
+  });
+  const mySpawns = room.find(FIND_MY_SPAWNS);
+
+  const maxExtensions =
+    CONTROLLER_STRUCTURES[STRUCTURE_EXTENSION][room.controller.level];
+
+  // build roads
+  buildRoads(room);
 
   if (maxExtensions > extensions.length) {
     for (let i = 2; i < 3; i++) {

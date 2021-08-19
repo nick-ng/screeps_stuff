@@ -32,7 +32,8 @@ const getSquare = (distance) => {
   return square;
 };
 
-const squareClear = ({ x, y }, room) => {
+const squareClear = ({ x, y }, room, options = {}) => {
+  const { swampClear, wallClear } = options;
   const squareContents = room.lookAt(x, y);
 
   const hasObstacles = squareContents.some((item) => {
@@ -45,9 +46,9 @@ const squareClear = ({ x, y }, room) => {
   const terrain = Game.map.getRoomTerrain(room.name);
   switch (terrain.get(x, y)) {
     case TERRAIN_MASK_WALL:
-      return false;
+      return wallClear || false;
     case TERRAIN_MASK_SWAMP:
-      return false;
+      return swampClear || false;
     case 0:
       break;
   }
