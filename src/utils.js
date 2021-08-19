@@ -14,18 +14,21 @@ const getSquare = (distance) => {
   const square = [];
   for (let x = 0; x <= distance; x++) {
     for (let y = 0; y <= distance; y++) {
-      if (y !== 0) {
-        square.push({ x, y: -y });
-      }
-      if (x !== 0) {
-        square.push({ x: -x, y });
-      }
       if (x !== 0 && y !== 0) {
         square.push({ x, y });
         square.push({ x: -x, y: -y });
+        square.push({ x: x, y: -y });
+        square.push({ x: -x, y: y });
+      } else if (y !== 0) {
+        square.push({ x, y: -y });
+        square.push({ x, y });
+      } else if (x !== 0) {
+        square.push({ x: -x, y });
+        square.push({ x, y });
       }
     }
   }
+
   return square;
 };
 
@@ -69,6 +72,14 @@ const siteClear = ({ x, y }, room) => {
   });
 };
 
+const isDepotStructure = (structure) => {
+  return (
+    structure.structureType == STRUCTURE_EXTENSION ||
+    structure.structureType == STRUCTURE_SPAWN ||
+    structure.structureType == STRUCTURE_TOWER
+  );
+};
+
 module.exports = {
   spawn: (blueprint, role, minUnits = 2, options, spawnIndex = 0) => {
     var count = _.filter(
@@ -107,4 +118,5 @@ module.exports = {
   getSquare,
   squareClear,
   siteClear,
+  isDepotStructure,
 };

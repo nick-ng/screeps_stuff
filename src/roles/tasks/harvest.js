@@ -1,4 +1,5 @@
 const utils = require("../../utils");
+const roleUtils = require("../utils");
 const taskUtils = require("./utils");
 const { DIGGING, HARVESTING, NOTHING } = require("./constants");
 
@@ -21,13 +22,13 @@ const getEmptyDepots = (creep) => {
   });
 };
 
-const bestSource = (creep) => {
+const sortedSources = (creep) => {
   const sources = creep.room.find(FIND_SOURCES);
   const goals = getEmptyDepots(creep).map((a) => ({
     pos: a.pos,
     range: 1,
   }));
-  const b = sources
+  return sources
     .map((source) => {
       // source.pos
       return {
@@ -35,8 +36,8 @@ const bestSource = (creep) => {
         cost: PathFinder.search(source.pos, goals).cost,
       };
     })
-    .sort((a, b) => a.cost - b.cost);
-  return b[0].source;
+    .sort((a, b) => a.cost - b.cost)
+    .map((a) => a.source);
 };
 
 const closestDepot = (creep) => {
@@ -64,28 +65,6 @@ const closestDepot = (creep) => {
   return b[0].goal;
 };
 
-const getWallsToDig = (creep, source) => {
-  const positions = utils.getSquare(1).map((newPos) => {
-    return { x: source.pos.x + newPos.x, y: source.pos.y + newPos.y };
-  });
-
-  const terrain = Game.map.getRoomTerrain(creep.room.name);
-
-  return positions.filter((position) => {
-    const squareContents = creep.room.lookAt(position.x, position.y);
-
-    const hasObstacles = squareContents.some((item) => {
-      return OBSTACLE_OBJECT_TYPES.includes(item.type);
-    });
-
-    if (hasObstacles) {
-      return false;
-    }
-
-    return terrain.get(position.x, position.y) === TERRAIN_MASK_WALL;
-  });
-};
-
 const harvest = (creep) => {
   const creepMemories = [];
   for (const name in Game.creeps) {
@@ -97,22 +76,57 @@ const harvest = (creep) => {
       creepMemories.push(creep.memory);
     }
   }
-  const source0 = bestSource(creep, creepMemories);
 
   if (creep.memory.task <= HARVESTING) {
     creep.memory.task = HARVESTING;
-    creep.say("b");
-    if (creep.store.getFreeCapacity() > 0) {
-      creep.memory.source = source0.id;
-      if (creep.harvest(source0) == ERR_NOT_IN_RANGE) {
-        creep.moveTo(source0, { visualizePathStyle: { stroke: "#ffaa00" } });
-      } else {
-        creep.memory.task = NOTHING;
+
+    if (typeof creep.memory.source === "string") {
+      creep.memory.source = null;
+    }
+    if (creep.memory.source) {
+      const sourceFreeSquares = roleUtils.getFreeSquares(
+        creep.room,
+        creep.memory.source.pos
+      );
+      const creepsHarvestingSource = creepMemories.filter(
+        (memory) => memory.source && memory.source.id === creep.memory.source.id
+      );
+
+      if (creepsHarvestingSource > sourceFreeSquares) {
         creep.memory.source = null;
       }
     } else {
+      for (const source of sortedSources(creep)) {
+        const sourceFreeSquares = roleUtils.getFreeSquares(
+          creep.room,
+          source.pos
+        );
+        const creepsHarvestingSource = creepMemories.filter((memory) => {
+          return memory.source && memory.source.id === source.id;
+        });
+
+        if (creepsHarvestingSource.length < sourceFreeSquares.length) {
+          creep.memory.source = source;
+          break;
+        }
+      }
+    }
+
+    if (creep.store.getFreeCapacity() > 0) {
+      creep.say(creep.memory.source.id);
+      const source0 = creep.room.find(FIND_SOURCES, {
+        filter: (source) => source.id === creep.memory.source.id,
+      })[0];
+      const result = creep.harvest(source0);
+      if (result === ERR_NOT_IN_RANGE) {
+        creep.moveTo(source0, {
+          visualizePathStyle: { stroke: "#ffaa00" },
+        });
+      } else {
+        creep.memory.task = NOTHING;
+      }
+    } else {
       const target0 = closestDepot(creep);
-      creep.memory.source = null;
 
       if (target0) {
         if (creep.transfer(target0, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {

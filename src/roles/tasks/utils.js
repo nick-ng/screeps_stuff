@@ -1,12 +1,6 @@
 const utils = require("../../utils");
 
-const isDepotStructure = (structure) => {
-  return (
-    structure.structureType == STRUCTURE_EXTENSION ||
-    structure.structureType == STRUCTURE_SPAWN ||
-    structure.structureType == STRUCTURE_TOWER
-  );
-};
+const { isDepotStructure } = utils;
 
 const getEmptyDepots = (creep) => {
   return creep.room.find(FIND_STRUCTURES, {

@@ -17,8 +17,8 @@ var roleBuilder = {
   },
   /** @param {Creep} creep **/
   run: function (creep) {
-    creep.say(`${creep.room.energyAvailable}`);
-    if (creep.room.energyAvailable <= 200) {
+    creep.say(`b ${creep.room.energyAvailable}`);
+    if (creep.room.energyAvailable <= 200 && !creep.memory.building) {
       return;
     }
     if (creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
@@ -29,16 +29,23 @@ var roleBuilder = {
     }
 
     if (creep.memory.building) {
-      var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
-      if (targets.length) {
-        if (creep.build(targets[0]) == ERR_NOT_IN_RANGE) {
-          creep.moveTo(targets[0], {
+      const target0 = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+      if (target0) {
+        if (creep.build(target0) == ERR_NOT_IN_RANGE) {
+          creep.moveTo(target0, {
             visualizePathStyle: { stroke: "#ffffff" },
           });
         }
       }
     } else {
-      const storage = utils.findStores(creep)[0];
+      const storage = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+        filter: (structure) =>
+          utils.isDepotStructure(structure) &&
+          structure.store.getUsedCapacity(RESOURCE_ENERGY) > 20,
+      });
+      if (!storage) {
+        return;
+      }
       if (creep.withdraw(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
         creep.moveTo(storage, { visualizePathStyle: { stroke: "#ffaa00" } });
       }
