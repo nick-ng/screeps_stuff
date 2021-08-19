@@ -19,11 +19,25 @@ const buildRoads = (room) => {
       path.forEach((a) => {
         const { x, y } = a;
 
-        if (utils.squareClear(a, room, { swampClear: true, wallClear: true })) {
+        if (
+          utils.squareClear(a, room, { swampClear: true, wallClear: false })
+        ) {
           const result = room.createConstructionSite(x, y, STRUCTURE_ROAD);
           if (![0, -7].includes(result)) {
             room.visual.text(result, x, y);
           }
+        }
+      });
+
+      const square = utils.getSquare(1).map((a) => ({
+        x: a.x + source.pos.x,
+        y: a.y + source.pos.y,
+      }));
+      square.forEach((a) => {
+        const { x, y } = a;
+        if (utils.squareClear(a, room, { swampClear: true, wallClear: true })) {
+          // room.visual.text("🚧", x, y);
+          // room.createConstructionSite(x, y, STRUCTURE_ROAD);
         }
       });
     }

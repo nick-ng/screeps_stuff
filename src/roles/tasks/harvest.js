@@ -113,7 +113,7 @@ const harvest = (creep) => {
     }
 
     if (creep.store.getFreeCapacity() > 0) {
-      creep.say(creep.memory.source.id);
+      // creep.say(creep.memory.source.id);
       const source0 = creep.room.find(FIND_SOURCES, {
         filter: (source) => source.id === creep.memory.source.id,
       })[0];
