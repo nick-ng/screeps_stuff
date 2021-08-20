@@ -1,4 +1,8 @@
-const manhattanRing = (distance) => {
+/**
+ * @param {number} distance
+ * @param {?{x: number, y: number}} origin
+ */
+const manhattanRing = (distance, origin = null) => {
   const ring = [];
   for (let x = 0; x <= distance; x++) {
     const y = distance - x;
@@ -7,10 +11,22 @@ const manhattanRing = (distance) => {
     if (x !== 0) ring.push({ x: -x, y });
     if (x !== 0 && y !== 0) ring.push({ x: -x, y: -y });
   }
+
+  if (origin) {
+    return ring.map((a) => ({
+      x: a.x + origin.x,
+      y: a.y + origin.y,
+    }));
+  }
+
   return ring;
 };
 
-const getSquare = (distance) => {
+/**
+ * @param {number} distance
+ * @param {?{x: number, y: number}} origin
+ */
+const getSquare = (distance, origin = null) => {
   const square = [];
   for (let x = 0; x <= distance; x++) {
     for (let y = 0; y <= distance; y++) {
@@ -27,6 +43,13 @@ const getSquare = (distance) => {
         square.push({ x, y });
       }
     }
+  }
+
+  if (origin) {
+    return square.map((a) => ({
+      x: a.x + origin.x,
+      y: a.y + origin.y,
+    }));
   }
 
   return square;

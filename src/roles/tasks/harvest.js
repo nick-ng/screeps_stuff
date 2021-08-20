@@ -1,6 +1,7 @@
 const utils = require("../../utils");
 const roleUtils = require("../utils");
 const taskUtils = require("./utils");
+const repairRoads = require("./repair-roads");
 const { DIGGING, HARVESTING, NOTHING } = require("./constants");
 
 const isDepotStructure = (structure) => {
@@ -56,7 +57,7 @@ const closestDepot = (creep) => {
           switch (creep.memory.role) {
             case "builder":
               return (
-                creep.room.find(FIND_CONSTRUCTION_SITES).length > 0 &&
+                // creep.room.find(FIND_CONSTRUCTION_SITES).length > 0 &&
                 creep.store.getFreeCapacity() > 0
               );
             case "upgrader":
@@ -161,6 +162,9 @@ const harvest = (creep) => {
         creep.memory.task = NOTHING;
       }
     } else {
+      if (repairRoads(creep)) {
+        return;
+      }
       creep.say("d");
       const target0 = closestDepot(creep);
 

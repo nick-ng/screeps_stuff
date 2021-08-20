@@ -15,15 +15,6 @@ var roleBuilder = {
         },
       });
       targets += targetsc.length;
-      const targetsd = room.find(FIND_STRUCTURES, {
-        filter: (structure) => {
-          return (
-            structure.structureType === "road" &&
-            structure.hitsMax - structure.hits > 0
-          );
-        },
-      });
-      targets += targetsd.length;
     });
 
     if (targets > 0) {
@@ -43,8 +34,41 @@ var roleBuilder = {
       creep.memory.building = true;
     }
 
+    const target0 = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+    const target1 = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+      filter: (structure) => {
+        return structure.hitsMax - structure.hits > 0;
+      },
+    });
+
+    // If nothing to do, get off the road
+    if (!target0 && !target1 && !target2) {
+      for (let n = 0; n < 10; n++) {
+        const ring = utils.manhattanRing(n, creep.pos);
+        for (const pos of ring) {
+          const squareContents = creep.room.lookAt(pos.x, pos.y);
+          const roads = squareContents.filter(
+            (t) =>
+              t.type === "structure" && t.structure.structureType === "road"
+          );
+          if (roads.length > 0) {
+            break;
+          }
+          const plains = squareContents.filter(
+            (t) => t.type === "terrain" && t.terrain === "plain"
+          );
+          if (plains.length > 0) {
+            creep.room.visual.text("😴", pos.x, pos.y);
+            if (creep.pos.x !== pos.x || creep.pos.y !== pos.y) {
+              creep.moveTo(pos.x, pos.y);
+            }
+            return;
+          }
+        }
+      }
+    }
+
     if (creep.memory.building) {
-      const target0 = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
       if (target0) {
         creep.say("🙂");
         if (creep.build(target0) == ERR_NOT_IN_RANGE) {
@@ -54,42 +78,17 @@ var roleBuilder = {
         }
         return;
       }
-      const target1 = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
-        filter: (structure) => {
-          return structure.hitsMax - structure.hits > 0;
-        },
-      });
+
       if (target1) {
         creep.say("😮");
         creep.room.visual.circle(target1.pos, {
+          fill: "transparent",
           radius: 3,
           opacity: 0.1,
           stroke: "#ffffff",
         });
         if (creep.repair(target1) === ERR_NOT_IN_RANGE) {
           creep.moveTo(target1, {
-            visualizePathStyle: { stroke: "#ffff00" },
-          });
-        }
-        return;
-      }
-      const target2 = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-        filter: (structure) => {
-          return (
-            structure.structureType === "road" &&
-            structure.hitsMax - structure.hits > 0
-          );
-        },
-      });
-      if (target2) {
-        creep.say("😮");
-        creep.room.visual.circle(target2.pos, {
-          radius: 3,
-          opacity: 0.1,
-          stroke: "#ffffff",
-        });
-        if (creep.repair(target2) === ERR_NOT_IN_RANGE) {
-          creep.moveTo(target2, {
             visualizePathStyle: { stroke: "#ffff00" },
           });
         }
