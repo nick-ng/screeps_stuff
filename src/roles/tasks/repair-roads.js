@@ -1,12 +1,22 @@
-const repairRoads = (creep) => {
-  const target2 = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-    filter: (structure) => {
-      return (
-        structure.structureType === "road" &&
-        structure.hitsMax - structure.hits > 0
-      );
-    },
-  });
+const searchOptions = {
+  filter: (structure) => {
+    return (
+      structure.structureType === "road" &&
+      structure.hitsMax - structure.hits > 0
+    );
+  },
+};
+
+const repairRoads = (creep, maxRange = 3) => {
+  const targets = creep.pos.findInRange(
+    FIND_STRUCTURES,
+    maxRange,
+    searchOptions
+  );
+  if (targets.length === 0) {
+    return false;
+  }
+  const target2 = creep.pos.findClosestByPath(FIND_STRUCTURES, searchOptions);
 
   if (target2) {
     creep.say("😮");

@@ -42,7 +42,7 @@ var roleBuilder = {
     });
 
     // If nothing to do, get off the road
-    if (!target0 && !target1 && !target2) {
+    if (!target0 && !target1) {
       for (let n = 0; n < 10; n++) {
         const ring = utils.manhattanRing(n, creep.pos);
         for (const pos of ring) {
