@@ -4,7 +4,7 @@ const tasks = require("./tasks");
 
 const ROLE_NAME = "worker";
 
-const getWorkerBluePrint = (availableEnergy) => {
+const getWorkerBluePrint = (spawn) => {
   return [WORK, CARRY, MOVE];
 };
 

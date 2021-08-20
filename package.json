@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "rollup ./src/main.js --watch.buildDelay 2000 --format cjs -p rollup-plugin-commonjs --watch --file ./dist/main.js"
+    "start": "rollup ./src/main.js --watch.buildDelay 2000 --format cjs -p rollup-plugin-commonjs --watch --file ./dist/main.js",
+    "two": "rollup --config rollup.config.js --watch"
   },
   "repository": {
     "type": "git",
@@ -18,6 +19,7 @@
   },
   "homepage": "https://github.com/nick-ng/screeps_stuff#readme",
   "dependencies": {
+    "dotenv": "^10.0.0",
     "rollup": "^2.56.2",
     "rollup-plugin-commonjs": "^10.1.0"
   }

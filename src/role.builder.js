@@ -27,7 +27,7 @@ var roleBuilder = {
     });
 
     if (targets > 0) {
-      utils.spawn([WORK, CARRY, CARRY, MOVE], ROLE_NAME, MIN_UNITS, {}, 0);
+      utils.spawn([WORK, CARRY, MOVE], ROLE_NAME, MIN_UNITS, {}, 0);
     }
   },
   /** @param {Creep} creep **/
@@ -61,6 +61,11 @@ var roleBuilder = {
       });
       if (target1) {
         creep.say("😮");
+        creep.room.visual.circle(target1.pos, {
+          radius: 3,
+          opacity: 0.1,
+          stroke: "#ffffff",
+        });
         if (creep.repair(target1) === ERR_NOT_IN_RANGE) {
           creep.moveTo(target1, {
             visualizePathStyle: { stroke: "#ffff00" },
@@ -78,6 +83,11 @@ var roleBuilder = {
       });
       if (target2) {
         creep.say("😮");
+        creep.room.visual.circle(target2.pos, {
+          radius: 3,
+          opacity: 0.1,
+          stroke: "#ffffff",
+        });
         if (creep.repair(target2) === ERR_NOT_IN_RANGE) {
           creep.moveTo(target2, {
             visualizePathStyle: { stroke: "#ffff00" },
