@@ -36,7 +36,35 @@ const getOffTheRoad = (creep) => {
   return false;
 };
 
+const getWorkers = (room) => {
+  return room.find(FIND_MY_CREEPS, {
+    filter: (creep) => {
+      return creep.memory.role === "worker";
+    },
+  });
+};
+
+const getWorkerBluePrint = (room) => {
+  const workers = getWorkers(room);
+  const energyCapacityAvailable = room.energyCapacityAvailable;
+  if (
+    workers.length < 3 ||
+    (energyCapacityAvailable < 400 && room.memory.energyPerTick < 1)
+  ) {
+    return [WORK, CARRY, MOVE];
+  }
+
+  return [CARRY, CARRY, WORK, WORK, MOVE, MOVE];
+};
+
+const getWorkerCost = (room) => {
+  return creepCost(getWorkerBluePrint(room));
+};
+
 module.exports = {
   creepCost,
   getOffTheRoad,
+  getWorkers,
+  getWorkerBluePrint,
+  getWorkerCost,
 };

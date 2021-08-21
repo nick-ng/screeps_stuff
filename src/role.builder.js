@@ -56,7 +56,11 @@ var roleBuilder = {
       },
     });
 
-    if (creep.room.energyAvailable <= 200 && workers.length < 1) {
+    if (
+      creep.room.energyAvailable <= creepUtils.getWorkerCost(creep.room) &&
+      workers.length < 1 &&
+      creep.store[RESOURCE_ENERGY] === 0
+    ) {
       creepUtils.getOffTheRoad(creep);
       return;
     }

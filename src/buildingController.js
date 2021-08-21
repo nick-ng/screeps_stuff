@@ -104,7 +104,7 @@ const buildExtension = (room) => {
 
   if (constructionSites.length === 0 && extensions.length < maxExtensions) {
     for (let i = 2; i < 99; i++) {
-      const sites = utils.manhattanRing(i);
+      const sites = _.shuffle(utils.manhattanRing(i));
       for (const site of sites) {
         const actualX = mySpawns[0].pos.x + site.x;
         const actualY = mySpawns[0].pos.y + site.y;

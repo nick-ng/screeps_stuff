@@ -1,4 +1,5 @@
 const utils = require("./utils");
+const creepUtils = require("./utils/creep");
 
 const ROLE_NAME = "upgrader";
 const MIN_UNITS = 1;
@@ -8,7 +9,10 @@ var roleUpgrader = {
   spawn: () => {
     const spawns = Game.spawns;
     Object.values(spawns).forEach((spawn, i) => {
-      if (spawn.room.energyAvailable <= 200) {
+      if (
+        spawn.room.energyAvailable <= creepUtils.getWorkerCost(spawn.room) ||
+        spawn.room.memory.energyPerTick < 1
+      ) {
         return;
       }
       utils.spawn([WORK, CARRY, MOVE], ROLE_NAME, MIN_UNITS, {}, i);
@@ -17,10 +21,12 @@ var roleUpgrader = {
 
   /** @param {Creep} creep **/
   run: function (creep) {
-    if (creep.room.energyAvailable <= 200) {
+    if (
+      creep.room.energyAvailable <= creepUtils.getWorkerCost(creep.room) ||
+      creep.room.memory.energyPerTick < 1
+    ) {
       if (creep.store[RESOURCE_ENERGY] == 0) {
-        creep.say(`${creep.room.energyAvailable}`);
-        return;
+        return creepUtils.getOffTheRoad(creep);
       } else {
         creep.memory.upgrading = true;
       }

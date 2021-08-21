@@ -52,7 +52,7 @@ const closestDepot = (creep) => {
       },
     })
     .concat(
-      creep.room.energyAvailable < 200
+      creep.room.memory.energyPerTick < creep.room.controller.level
         ? []
         : creep.room.find(FIND_MY_CREEPS, {
             filter: (creep) => {
@@ -62,8 +62,6 @@ const closestDepot = (creep) => {
                     // creep.room.find(FIND_CONSTRUCTION_SITES).length > 0 &&
                     creep.store.getFreeCapacity() > 0
                   );
-                case "upgrader":
-                  return creep.store.getFreeCapacity() > 20;
                 default:
                   return false;
               }
