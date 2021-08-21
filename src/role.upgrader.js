@@ -29,6 +29,7 @@ var roleUpgrader = {
       if (creep.store[RESOURCE_ENERGY] == 0) {
         return creepUtils.getOffTheRoad(creep);
       } else {
+        creep.memory.idle = false;
         creep.memory.upgrading = true;
       }
     }

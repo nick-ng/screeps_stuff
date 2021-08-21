@@ -9,6 +9,7 @@ const creepCost = (creepBody) =>
   }, 0);
 
 const getOffTheRoad = (creep) => {
+  creep.memory.idle = true;
   for (let n = 0; n < 10; n++) {
     const ring = utils.manhattanRing(n, creep.pos);
     for (const pos of ring) {
@@ -54,7 +55,7 @@ const getWorkerBluePrint = (room) => {
   const workers = getWorkers(room);
   const energyCapacityAvailable = room.energyCapacityAvailable;
   if (
-    workers.length < 3 ||
+    workers.length < 1 ||
     energyCapacityAvailable < 400 ||
     room.memory.energyPerTick < 0
   ) {
@@ -65,12 +66,12 @@ const getWorkerBluePrint = (room) => {
 
   for (let n = 0; n < 3; n++) {
     if (
-      creepCost(currentWorkerBluePrint.concat(workerBluePrintPart)) >
+      creepCost(currentWorkerBluePrint.concat(workerBluePrintPart)) >=
       energyCapacityAvailable
     ) {
       return currentWorkerBluePrint;
     }
-    currentWorkerBluePrint.push(workerBluePrintPart);
+    currentWorkerBluePrint.push(...workerBluePrintPart);
   }
 
   return currentWorkerBluePrint;

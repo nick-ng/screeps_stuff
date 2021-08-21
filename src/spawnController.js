@@ -17,10 +17,10 @@ const updateRoomMemory = (room, data) => {
   };
 };
 
-const updateRoomEnergyStats = (room) => {
+const getRoomEnergyStats = (room) => {
   const { energyHistory, lastUpdated } = room.memory;
   if (lastUpdated === Game.time) {
-    return;
+    return {};
   }
 
   const newData = {};
@@ -42,12 +42,12 @@ const updateRoomEnergyStats = (room) => {
   }
   newData.energyPerTick = energyPerTick;
 
-  updateRoomMemory(room, newData);
+  return newData;
 };
 
-const updateRoomSources = (room) => {
+const getRoomSources = (room) => {
   if (room.memory.sources) {
-    return;
+    return room.memory.sources;
   }
 
   const newSources = {};
@@ -70,29 +70,88 @@ const updateRoomSources = (room) => {
       pathToSourceLength: pathToSource.length,
     };
   });
+  return { sources: newSources };
+};
 
-  updateRoomMemory(room, { sources: newSources });
+const getRoomRoadStats = (room) => {
+  const { roads, lastUpdated } = room.memory;
+  if (lastUpdated === Game.time) {
+    return {};
+  }
+
+  const newRoads = !roads
+    ? {}
+    : Object.keys(roads).reduce((prev, curr) => {
+        const value = roads[curr] - 0.03;
+
+        if (value > 0) {
+          prev[curr] = Math.min(value, 100);
+        }
+
+        return prev;
+      }, {});
+
+  const creeps = room.find(FIND_MY_CREEPS, {
+    filter: (creep) => creep.memory.role !== "builder",
+  });
+
+  creeps.forEach((creep) => {
+    if (creep.memory.idle) {
+      return;
+    }
+    const { pos } = creep;
+
+    // Ignore positions that already have construction sites or structures
+    const posContents = room.lookAt(pos).filter((content) => {
+      return content.type === "constructionSite" || content.type == "structure";
+    });
+    if (posContents.length > 0) {
+      return;
+    }
+
+    const posKey = `${pos.x}_${pos.y}`;
+
+    if (newRoads[posKey]) {
+      newRoads[posKey] += 1;
+    } else {
+      newRoads[posKey] = 1;
+    }
+  });
+
+  return { roads: newRoads };
 };
 
 module.exports = {
   run: () => {
     Object.values(Game.spawns).forEach((spawn) => {
-      updateRoomSources(spawn.room);
-      updateRoomEnergyStats(spawn.room);
+      updateRoomMemory(spawn.room, {
+        ...getRoomSources(spawn.room),
+        ...getRoomEnergyStats(spawn.room),
+        ...getRoomRoadStats(spawn.room),
+      });
 
       const roomStats = `Energy: ${spawn.room.energyAvailable}/${
         spawn.room.energyCapacityAvailable
       } (${(spawn.room.memory.energyPerTick || 0).toFixed(3)}/T)`;
-      let maxWorkers = 0;
-      Object.values(spawn.room.memory.sources).forEach((source) => {
-        maxWorkers +=
-          source.freeSquares + Math.floor(source.pathToSourceLength / 20);
-      });
-      const workerStats = `Max Workers: ${maxWorkers} | Worker Cost: ${creepUtils.getWorkerCost(
+
+      const workerStats = `Worker Cost: ${creepUtils.getWorkerCost(
         spawn.room
       )}`;
 
       spawn.room.visual.text(roomStats, 25, 25).text(workerStats, 25, 26);
+
+      Object.keys(spawn.room.memory.roads).forEach((key) => {
+        if (spawn.room.memory.roads[key] < 8) {
+          return;
+        }
+        const [x, y] = key.split("_").map((a) => parseInt(a, 10));
+
+        spawn.room.visual.text(
+          Math.floor(Math.min(spawn.room.memory.roads[key], 99)),
+          x,
+          y
+        );
+      });
     });
   },
 };

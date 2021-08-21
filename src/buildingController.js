@@ -11,6 +11,36 @@ const roadObstacleFilter = (item) => {
 };
 
 const buildRoads = (room) => {
+  let extraRoadPos = {};
+  let extraRoadValue = 10;
+  let buildExtraRoad = false;
+  Object.keys(room.memory.roads).forEach((key) => {
+    const [x, y] = key.split("_").map((a) => parseInt(a, 10));
+
+    const value = room.memory.roads[key];
+
+    if (value > extraRoadValue) {
+      extraRoadPos = { x, y };
+      extraRoadValue = value;
+      buildExtraRoad = true;
+    }
+  });
+
+  if (buildExtraRoad) {
+    const { x, y } = extraRoadPos;
+    if (
+      utils.squareClear(extraRoadPos, room, {
+        swampClear: true,
+        wallClear: false,
+        customObstacleFilter: roadObstacleFilter,
+      })
+    ) {
+      room.visual.text("🚗", x, y);
+      room.createConstructionSite(x, y, STRUCTURE_ROAD);
+      room.memory.roads = null;
+    }
+  }
+
   const sources = room.find(FIND_SOURCES);
   const depots = room.find(FIND_MY_STRUCTURES, {
     filter: utils.isDepotStructure,
@@ -31,6 +61,7 @@ const buildRoads = (room) => {
 
         if (
           utils.squareClear(a, room, {
+            plainsClear: false,
             swampClear: true,
             wallClear: false,
             customObstacleFilter: roadObstacleFilter,
@@ -41,47 +72,6 @@ const buildRoads = (room) => {
           if (![0].includes(result)) {
             room.visual.text(result, x, y);
           }
-        }
-      });
-
-      const square = utils.getSquare(2).map((a) => ({
-        x: a.x + source.pos.x,
-        y: a.y + source.pos.y,
-      }));
-      square.forEach((a) => {
-        const { x, y } = a;
-        if (
-          utils.squareClear(a, room, {
-            swampClear: true,
-            wallClear: false,
-            customObstacleFilter: roadObstacleFilter,
-          })
-        ) {
-          room.visual.text("🚗", x, y);
-          room.createConstructionSite(x, y, STRUCTURE_ROAD);
-        }
-      });
-      const roadConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
-        filter: (site) => {
-          return site.structureType === STRUCTURE_ROAD;
-        },
-      });
-
-      if (roadConstructionSites.length > 0) {
-        return;
-      }
-      return; // Roads on walls don't seem worth it.
-      square.forEach((a) => {
-        const { x, y } = a;
-        if (
-          utils.squareClear(a, room, {
-            swampClear: true,
-            wallClear: true,
-            customObstacleFilter: roadObstacleFilter,
-          })
-        ) {
-          room.visual.text("🚗", x, y);
-          room.createConstructionSite(x, y, STRUCTURE_ROAD);
         }
       });
     }

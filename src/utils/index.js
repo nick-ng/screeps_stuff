@@ -56,7 +56,7 @@ const getSquare = (distance, origin = null) => {
 };
 
 const squareClear = ({ x, y }, room, options = {}) => {
-  const { swampClear, wallClear, customObstacleFilter } = options;
+  const { swampClear, plainsClear, wallClear, customObstacleFilter } = options;
   const squareContents = room.lookAt(x, y);
 
   const hasObstacles = squareContents.some((item) => {
@@ -79,7 +79,11 @@ const squareClear = ({ x, y }, room, options = {}) => {
     case TERRAIN_MASK_SWAMP:
       return swampClear || false;
     case 0:
-      break;
+      if (typeof plainsClear === "undefined") {
+        return true;
+      } else {
+        return plainsClear;
+      }
   }
   return true;
 };

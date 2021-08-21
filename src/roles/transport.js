@@ -47,5 +47,6 @@ module.exports = {
     if (spawns.length === 0) {
       return creepUtils.getOffTheRoad(creep);
     }
+    creep.memory.idle = false;
   },
 };

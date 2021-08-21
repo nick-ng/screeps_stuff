@@ -26,6 +26,24 @@ const buildTarget = (creep) => {
     return targeta;
   }
 
+  const targetb = creep.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES, {
+    filter: (site) => {
+      const look = creep.room.lookAt(site.pos);
+      const isRoad =
+        look.filter(
+          (item) =>
+            item.type === "constructionSite" &&
+            item.constructionSite.structureType === "road"
+        ).length > 0;
+
+      return !isRoad;
+    },
+  });
+
+  if (targetb) {
+    return targetb;
+  }
+
   return creep.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES);
 };
 
@@ -49,7 +67,10 @@ var roleBuilder = {
 
       if (
         creepUtils.getCreepsByRole(spawn.room, ROLE_NAME).length < MAX_UNITS ||
-        spawn.room.energyAvailable === spawn.room.energyCapacityAvailable
+        (spawn.room.energyAvailable === spawn.room.energyCapacityAvailable &&
+          creepUtils.getWorkerCost(spawn.room) <
+            spawn.room.energyCapacityAvailable &&
+          creepUtils.getCreepsByRole(spawn.room, ROLE_NAME).length < 7)
       ) {
         spawn.spawnCreep(
           creepUtils.getWorkerBluePrint(spawn.room),
@@ -78,6 +99,7 @@ var roleBuilder = {
       creepUtils.getOffTheRoad(creep);
       return;
     }
+    creep.memory.idle = false;
     if (creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
       creep.memory.building = false;
     }
@@ -97,6 +119,7 @@ var roleBuilder = {
       creepUtils.getOffTheRoad(creep);
       return;
     }
+    creep.memory.idle = false;
 
     if (creep.memory.building) {
       if (target0) {
