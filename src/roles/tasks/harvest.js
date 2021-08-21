@@ -101,39 +101,6 @@ const harvest = (creep) => {
   if (creep.memory.task <= HARVESTING) {
     creep.memory.task = HARVESTING;
 
-    // Assigning source to worker
-    if (typeof creep.memory.source === "string") {
-      creep.memory.source = null;
-    }
-    if (creep.memory.source) {
-      const a = creep.room.memory.sources[creep.memory.source.id];
-      const sourceFreeSquares =
-        a.freeSquares + Math.floor(a.pathToSourceLength / PATH_THRESHOLD);
-
-      const creepsHarvestingSource = creepMemories.filter(
-        (memory) => memory.source && memory.source.id === creep.memory.source.id
-      );
-
-      if (creepsHarvestingSource.length > sourceFreeSquares) {
-        creep.memory.source = null;
-      }
-    } else {
-      for (const source of sortedSources(creep)) {
-        const a = creep.room.memory.sources[source.id];
-        const sourceFreeSquares =
-          a.freeSquares + Math.floor(a.pathToSourceLength / PATH_THRESHOLD);
-
-        const creepsHarvestingSource = creepMemories.filter((memory) => {
-          return memory.source && memory.source.id === source.id;
-        });
-
-        if (creepsHarvestingSource.length < sourceFreeSquares) {
-          creep.memory.source = source;
-          break;
-        }
-      }
-    }
-
     if (!creep.memory.subTask) {
       creep.memory.subTask = "delivering";
     }
@@ -149,6 +116,27 @@ const harvest = (creep) => {
       creep.store.getFreeCapacity() === 0
     ) {
       creep.memory.subTask = "delivering";
+    }
+
+    // Assigning source to worker
+    if (typeof creep.memory.source === "string") {
+      creep.memory.source = null;
+    }
+    if (!creep.memory.source) {
+      for (const source of sortedSources(creep)) {
+        const a = creep.room.memory.sources[source.id];
+        const sourceFreeSquares =
+          a.freeSquares + Math.floor(a.pathToSourceLength / PATH_THRESHOLD);
+
+        const creepsHarvestingSource = creepMemories.filter((memory) => {
+          return memory.source && memory.source.id === source.id;
+        });
+
+        if (creepsHarvestingSource.length < sourceFreeSquares) {
+          creep.memory.source = source;
+          break;
+        }
+      }
     }
 
     if (creep.memory.subTask === "harvesting") {

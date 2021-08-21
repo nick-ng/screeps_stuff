@@ -84,7 +84,7 @@ const squareClear = ({ x, y }, room, options = {}) => {
   return true;
 };
 
-const siteClear = ({ x, y }, room) => {
+const siteClear = ({ x, y }, room, options) => {
   return [
     { x: 0, y: 0 },
     { x: 0, y: 1 },
@@ -98,7 +98,7 @@ const siteClear = ({ x, y }, room) => {
   ].every((coords) => {
     const xx = x + coords.x;
     const yy = y + coords.y;
-    return squareClear({ x: xx, y: yy }, room);
+    return squareClear({ x: xx, y: yy }, room, options);
   });
 };
 
