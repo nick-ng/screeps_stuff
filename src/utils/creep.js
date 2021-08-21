@@ -48,17 +48,32 @@ const getWorkers = (room) => {
   return getCreepsByRole(room, "worker");
 };
 
+const workerBluePrintPart = [WORK, CARRY, MOVE];
+
 const getWorkerBluePrint = (room) => {
   const workers = getWorkers(room);
   const energyCapacityAvailable = room.energyCapacityAvailable;
   if (
     workers.length < 3 ||
-    (energyCapacityAvailable < 400 && room.memory.energyPerTick < 1)
+    energyCapacityAvailable < 400 ||
+    room.memory.energyPerTick < 0
   ) {
-    return [WORK, CARRY, MOVE];
+    return workerBluePrintPart;
   }
 
-  return [CARRY, CARRY, WORK, WORK, MOVE, MOVE];
+  const currentWorkerBluePrint = [];
+
+  for (let n = 0; n < 3; n++) {
+    if (
+      creepCost(currentWorkerBluePrint.concat(workerBluePrintPart)) >
+      energyCapacityAvailable
+    ) {
+      return currentWorkerBluePrint;
+    }
+    currentWorkerBluePrint.push(workerBluePrintPart);
+  }
+
+  return currentWorkerBluePrint;
 };
 
 const getWorkerCost = (room) => {

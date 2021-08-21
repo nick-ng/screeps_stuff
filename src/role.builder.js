@@ -43,8 +43,13 @@ var roleBuilder = {
         return;
       }
 
+      if (creepUtils.getCreepsByRole(spawn.room, "worker").length === 0) {
+        return;
+      }
+
       if (
-        creepUtils.getCreepsByRole(spawn.room, ROLE_NAME).length < MAX_UNITS
+        creepUtils.getCreepsByRole(spawn.room, ROLE_NAME).length < MAX_UNITS ||
+        spawn.room.energyAvailable === spawn.room.energyCapacityAvailable
       ) {
         spawn.spawnCreep(
           creepUtils.getWorkerBluePrint(spawn.room),

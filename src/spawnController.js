@@ -54,7 +54,9 @@ const updateRoomSources = (room) => {
 
   room.find(FIND_SOURCES).forEach((source) => {
     const spawns = room.find(FIND_MY_SPAWNS);
-    const freeSquares = roleUtils.getFreeSquares(spawns[0].room, source.pos);
+    const freeSquares = roleUtils.getFreeSquares(spawns[0].room, source.pos, {
+      swampClear: true,
+    });
 
     const pathToSource = room.findPath(source.pos, spawns[0].pos, {
       ignoreCreeps: true,
@@ -81,7 +83,12 @@ module.exports = {
       const roomStats = `Energy: ${spawn.room.energyAvailable}/${
         spawn.room.energyCapacityAvailable
       } (${(spawn.room.memory.energyPerTick || 0).toFixed(3)}/T)`;
-      const workerStats = `Worker Cost: ${creepUtils.getWorkerCost(
+      let maxWorkers = 0;
+      Object.values(spawn.room.memory.sources).forEach((source) => {
+        maxWorkers +=
+          source.freeSquares + Math.floor(source.pathToSourceLength / 20);
+      });
+      const workerStats = `Max Workers: ${maxWorkers} | Worker Cost: ${creepUtils.getWorkerCost(
         spawn.room
       )}`;
 

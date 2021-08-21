@@ -100,10 +100,17 @@ const buildExtension = (room) => {
   // build roads
   buildRoads(room);
 
-  const constructionSites = room.find(FIND_MY_CONSTRUCTION_SITES);
+  const extensionConstructionSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
+    filter: {
+      structureType: STRUCTURE_EXTENSION,
+    },
+  });
 
-  if (constructionSites.length === 0 && extensions.length < maxExtensions) {
-    for (let i = 2; i < 99; i++) {
+  if (
+    extensionConstructionSites.length === 0 &&
+    extensions.length < maxExtensions
+  ) {
+    for (let i = 4; i < 50; i++) {
       const sites = _.shuffle(utils.manhattanRing(i));
       for (const site of sites) {
         const actualX = mySpawns[0].pos.x + site.x;
@@ -114,7 +121,11 @@ const buildExtension = (room) => {
         if (actualY < 0 || actualY > 49) {
           continue;
         }
-        if (utils.siteClear({ x: actualX, y: actualY }, room)) {
+        if (
+          utils.siteClear({ x: actualX, y: actualY }, room, {
+            swampClear: true,
+          })
+        ) {
           room.createConstructionSite(actualX, actualY, STRUCTURE_EXTENSION);
           return;
         }

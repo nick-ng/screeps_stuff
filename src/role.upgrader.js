@@ -22,8 +22,9 @@ var roleUpgrader = {
   /** @param {Creep} creep **/
   run: function (creep) {
     if (
-      creep.room.energyAvailable <= creepUtils.getWorkerCost(creep.room) ||
-      creep.room.memory.energyPerTick < 1
+      (creep.room.energyAvailable <= creepUtils.getWorkerCost(creep.room) ||
+        creep.room.memory.energyPerTick < 1) &&
+      creep.room.energyAvailable < creep.room.energyCapacityAvailable
     ) {
       if (creep.store[RESOURCE_ENERGY] == 0) {
         return creepUtils.getOffTheRoad(creep);
