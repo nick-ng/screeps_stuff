@@ -41,6 +41,15 @@ const buildRoads = (room) => {
     }
   }
 
+  if (
+    room.find(FIND_STRUCTURES, {
+      filter: (structure) => {
+        return structure.structureType === STRUCTURE_ROAD;
+      },
+    }).length > 0
+  ) {
+    return;
+  }
   const sources = room.find(FIND_SOURCES);
   const depots = room.find(FIND_MY_STRUCTURES, {
     filter: utils.isDepotStructure,

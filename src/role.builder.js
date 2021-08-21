@@ -70,7 +70,8 @@ var roleBuilder = {
         (spawn.room.energyAvailable === spawn.room.energyCapacityAvailable &&
           creepUtils.getWorkerCost(spawn.room) <
             spawn.room.energyCapacityAvailable &&
-          creepUtils.getCreepsByRole(spawn.room, ROLE_NAME).length < 7)
+          creepUtils.getCreepsByRole(spawn.room, ROLE_NAME).length <
+            Math.min(7, constructionSites.length))
       ) {
         spawn.spawnCreep(
           creepUtils.getWorkerBluePrint(spawn.room),

@@ -24,7 +24,12 @@ const getOffTheRoad = (creep) => {
       const plains = squareContents.filter(
         (t) => t.type === "terrain" && t.terrain === "plain"
       );
-      if (plains.length > 0) {
+      const obstacles = squareContents.filter(
+        (t) =>
+          t.type === "structure" ||
+          (t.type === "creep" && pos.x !== creep.pos.x && pos.y !== creep.pos.y)
+      );
+      if (plains.length > 0 && obstacles.length === 0) {
         creep.room.visual.text("😴", pos.x, pos.y);
         if (creep.pos.x !== pos.x || creep.pos.y !== pos.y) {
           creep.moveTo(pos.x, pos.y);

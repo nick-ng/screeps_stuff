@@ -11,6 +11,7 @@ const loop = function () {
   utils.cleanMemory();
 
   // roles.shooter.spawn();
+  roles.transport.spawn();
   roleUpgrader.spawn();
   roleBuilder.spawn();
   roles.worker.spawn();
@@ -48,6 +49,9 @@ const loop = function () {
     }
     if (creep.memory.role === "builder") {
       roleBuilder.run(creep);
+    }
+    if (creep.memory.role === "transport") {
+      roles.transport.run(creep);
     }
   }
 };

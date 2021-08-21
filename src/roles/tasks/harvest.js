@@ -44,32 +44,31 @@ const sortedSources = (creep) => {
 };
 
 const closestDepot = (creep) => {
-  const goals = creep.room
-    .find(FIND_MY_STRUCTURES, {
-      filter: (structure) => {
-        return (
-          isDepotStructure(structure) &&
-          structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
-        );
-      },
-    })
-    .concat(
-      creep.room.memory.energyPerTick < creep.room.controller.level
-        ? []
-        : creep.room.find(FIND_MY_CREEPS, {
-            filter: (creep) => {
-              switch (creep.memory.role) {
-                case "builder":
-                  return (
-                    // creep.room.find(FIND_CONSTRUCTION_SITES).length > 0 &&
-                    creep.store.getFreeCapacity() > 0
-                  );
-                default:
-                  return false;
-              }
-            },
-          })
-    );
+  const goals = creep.room.find(FIND_MY_STRUCTURES, {
+    filter: (structure) => {
+      return (
+        isDepotStructure(structure) &&
+        structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+      );
+    },
+  });
+  // .concat(
+  //   creep.room.memory.energyPerTick < creep.room.controller.level
+  //     ? []
+  //     : creep.room.find(FIND_MY_CREEPS, {
+  //         filter: (creep) => {
+  //           switch (creep.memory.role) {
+  //             case "builder":
+  //               return (
+  //                 // creep.room.find(FIND_CONSTRUCTION_SITES).length > 0 &&
+  //                 creep.store.getFreeCapacity() > 0
+  //               );
+  //             default:
+  //               return false;
+  //           }
+  //         },
+  //       })
+  // );
 
   const b = goals
     .map((goal) => {
