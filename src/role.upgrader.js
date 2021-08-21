@@ -11,19 +11,25 @@ var roleUpgrader = {
     Object.values(spawns).forEach((spawn, i) => {
       if (
         spawn.room.energyAvailable <= creepUtils.getWorkerCost(spawn.room) ||
-        spawn.room.memory.energyPerTick < 1
+        spawn.room.memory.energyPerTick < 0
       ) {
         return;
       }
-      utils.spawn([WORK, CARRY, MOVE], ROLE_NAME, MIN_UNITS, {}, i);
+      utils.spawn(
+        creepUtils.getWorkerBluePrint(spawn.room),
+        ROLE_NAME,
+        MIN_UNITS,
+        {},
+        i
+      );
     });
   },
 
   /** @param {Creep} creep **/
   run: function (creep) {
     if (
-      (creep.room.energyAvailable <= creepUtils.getWorkerCost(creep.room) ||
-        creep.room.memory.energyPerTick < 1) &&
+      (creep.room.energyAvailable <= 200 ||
+        creep.room.memory.energyPerTick < 0) &&
       creep.room.energyAvailable < creep.room.energyCapacityAvailable
     ) {
       if (creep.store[RESOURCE_ENERGY] == 0) {

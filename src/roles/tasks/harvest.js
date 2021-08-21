@@ -4,7 +4,7 @@ const taskUtils = require("./utils");
 const repairRoads = require("./repair-roads");
 const { DIGGING, HARVESTING, NOTHING } = require("./constants");
 
-const PATH_THRESHOLD = 20;
+const PATH_THRESHOLD = 10;
 
 const isDepotStructure = (structure) => {
   return (

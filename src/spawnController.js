@@ -141,7 +141,7 @@ module.exports = {
       spawn.room.visual.text(roomStats, 25, 25).text(workerStats, 25, 26);
 
       Object.keys(spawn.room.memory.roads).forEach((key) => {
-        if (spawn.room.memory.roads[key] < 8) {
+        if (spawn.room.memory.roads[key] < 5) {
           return;
         }
         const [x, y] = key.split("_").map((a) => parseInt(a, 10));

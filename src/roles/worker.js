@@ -21,7 +21,7 @@ module.exports = {
       } else {
         Object.values(spawn.room.memory.sources).forEach((source) => {
           maxWorkers +=
-            source.freeSquares + Math.floor(source.pathToSourceLength / 20);
+            source.freeSquares + Math.floor(source.pathToSourceLength / 10);
         });
       }
 
