@@ -13,15 +13,19 @@ module.exports = {
     const spawns = Game.spawns;
     Object.values(spawns).forEach((spawn, i) => {
       const creeps = getWorkers(spawn.room);
-      const sources = spawn.room.find(FIND_SOURCES);
 
-      const totalFreeSquares = sources
-        .map((source) => {
-          return roleUtils.getFreeSquares(spawn.room, source.pos);
-        })
-        .reduce((prev, curr) => prev + curr.length, 0);
+      let maxWorkers = 0;
 
-      if (creeps.length < totalFreeSquares) {
+      if (!spawn.room.memory.sources) {
+        maxWorkers = 1;
+      } else {
+        Object.values(spawn.room.memory.sources).forEach((source) => {
+          maxWorkers +=
+            source.freeSquares + Math.floor(source.pathToSourceLength / 20);
+        });
+      }
+
+      if (creeps.length < maxWorkers) {
         utils.spawn(getWorkerBluePrint(spawn.room), ROLE_NAME, 999, {}, i);
       }
     });

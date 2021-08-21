@@ -4,6 +4,8 @@ const taskUtils = require("./utils");
 const repairRoads = require("./repair-roads");
 const { DIGGING, HARVESTING, NOTHING } = require("./constants");
 
+const PATH_THRESHOLD = 20;
+
 const isDepotStructure = (structure) => {
   return (
     structure.structureType == STRUCTURE_EXTENSION ||
@@ -99,32 +101,33 @@ const harvest = (creep) => {
   if (creep.memory.task <= HARVESTING) {
     creep.memory.task = HARVESTING;
 
+    // Assigning source to worker
     if (typeof creep.memory.source === "string") {
       creep.memory.source = null;
     }
     if (creep.memory.source) {
-      const sourceFreeSquares = roleUtils.getFreeSquares(
-        creep.room,
-        creep.memory.source.pos
-      );
+      const a = creep.room.memory.sources[creep.memory.source.id];
+      const sourceFreeSquares =
+        a.freeSquares + Math.floor(a.pathToSourceLength / PATH_THRESHOLD);
+
       const creepsHarvestingSource = creepMemories.filter(
         (memory) => memory.source && memory.source.id === creep.memory.source.id
       );
 
-      if (creepsHarvestingSource > sourceFreeSquares) {
+      if (creepsHarvestingSource.length > sourceFreeSquares) {
         creep.memory.source = null;
       }
     } else {
       for (const source of sortedSources(creep)) {
-        const sourceFreeSquares = roleUtils.getFreeSquares(
-          creep.room,
-          source.pos
-        );
+        const a = creep.room.memory.sources[source.id];
+        const sourceFreeSquares =
+          a.freeSquares + Math.floor(a.pathToSourceLength / PATH_THRESHOLD);
+
         const creepsHarvestingSource = creepMemories.filter((memory) => {
           return memory.source && memory.source.id === source.id;
         });
 
-        if (creepsHarvestingSource.length < sourceFreeSquares.length) {
+        if (creepsHarvestingSource.length < sourceFreeSquares) {
           creep.memory.source = source;
           break;
         }

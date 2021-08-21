@@ -1,4 +1,5 @@
 const creepUtils = require("./utils/creep");
+const roleUtils = require("./roles/utils");
 
 const updateRoomMemory = (room, data) => {
   if (!room.memory) {
@@ -10,6 +11,7 @@ const updateRoomMemory = (room, data) => {
   }
 
   room.memory = {
+    ...room.memory,
     ...data,
     lastUpdated: Game.time,
   };
@@ -43,13 +45,42 @@ const updateRoomEnergyStats = (room) => {
   updateRoomMemory(room, newData);
 };
 
+const updateRoomSources = (room) => {
+  if (room.memory.sources) {
+    return;
+  }
+
+  const newSources = {};
+
+  room.find(FIND_SOURCES).forEach((source) => {
+    const spawns = room.find(FIND_MY_SPAWNS);
+    const freeSquares = roleUtils.getFreeSquares(spawns[0].room, source.pos);
+
+    const pathToSource = room.findPath(source.pos, spawns[0].pos, {
+      ignoreCreeps: true,
+      ignoreRoads: true,
+      plainCost: 1,
+      swampCost: 1,
+    });
+
+    newSources[source.id] = {
+      freeSquares: freeSquares.length,
+      pathToSourceLength: pathToSource.length,
+    };
+  });
+
+  updateRoomMemory(room, { sources: newSources });
+};
+
 module.exports = {
   run: () => {
     Object.values(Game.spawns).forEach((spawn) => {
+      updateRoomSources(spawn.room);
       updateRoomEnergyStats(spawn.room);
+
       const roomStats = `Energy: ${spawn.room.energyAvailable}/${
         spawn.room.energyCapacityAvailable
-      } (${spawn.room.memory.energyPerTick.toFixed(3)}/T)`;
+      } (${(spawn.room.memory.energyPerTick || 0).toFixed(3)}/T)`;
       const workerStats = `Worker Cost: ${creepUtils.getWorkerCost(
         spawn.room
       )}`;
