@@ -50,12 +50,9 @@ module.exports = {
       const roomStats = `Energy: ${spawn.room.energyAvailable}/${
         spawn.room.energyCapacityAvailable
       } (${spawn.room.memory.energyPerTick.toFixed(3)}/T)`;
-      const workers = spawn.room.find(FIND_MY_CREEPS, {
-        filter: (creep) => creep.memory.role === "worker",
-      });
-      const workerStats = `Oldest Worker TTL: ${_.min(
-        workers.map((worker) => worker.ticksToLive)
-      )} | Worker Cost: ${creepUtils.getWorkerCost(spawn.room)}`;
+      const workerStats = `Worker Cost: ${creepUtils.getWorkerCost(
+        spawn.room
+      )}`;
 
       spawn.room.visual.text(roomStats, 25, 25).text(workerStats, 25, 26);
     });

@@ -36,12 +36,16 @@ const getOffTheRoad = (creep) => {
   return false;
 };
 
-const getWorkers = (room) => {
+const getCreepsByRole = (room, role) => {
   return room.find(FIND_MY_CREEPS, {
     filter: (creep) => {
-      return creep.memory.role === "worker";
+      return creep.memory.role === role;
     },
   });
+};
+
+const getWorkers = (room) => {
+  return getCreepsByRole(room, "worker");
 };
 
 const getWorkerBluePrint = (room) => {
@@ -64,6 +68,7 @@ const getWorkerCost = (room) => {
 module.exports = {
   creepCost,
   getOffTheRoad,
+  getCreepsByRole,
   getWorkers,
   getWorkerBluePrint,
   getWorkerCost,

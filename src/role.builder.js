@@ -2,7 +2,7 @@ const utils = require("./utils");
 const creepUtils = require("./utils/creep");
 
 const ROLE_NAME = "builder";
-const MIN_UNITS = 1;
+const MAX_UNITS = 1;
 
 const buildTarget = (creep) => {
   const targeta = creep.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES, {
@@ -31,21 +31,30 @@ const buildTarget = (creep) => {
 
 var roleBuilder = {
   spawn: () => {
-    let targets = 0;
-    Object.values(Game.rooms).forEach((room) => {
-      const targetsb = room.find(FIND_CONSTRUCTION_SITES);
-      targets += targetsb.length;
-      const targetsc = room.find(FIND_MY_STRUCTURES, {
+    Object.values(Game.spawns).forEach((spawn) => {
+      const constructionSites = spawn.room.find(FIND_CONSTRUCTION_SITES);
+      const repairSites = spawn.room.find(FIND_MY_STRUCTURES, {
         filter: (structure) => {
           return structure.hitsMax - structure.hits > 0;
         },
       });
-      targets += targetsc.length;
-    });
 
-    if (targets > 0) {
-      utils.spawn([WORK, CARRY, MOVE], ROLE_NAME, MIN_UNITS, {}, 0);
-    }
+      if (constructionSites.length === 0 && repairSites.length === 0) {
+        return;
+      }
+
+      if (
+        creepUtils.getCreepsByRole(spawn.room, ROLE_NAME).length < MAX_UNITS
+      ) {
+        spawn.spawnCreep(
+          creepUtils.getWorkerBluePrint(spawn.room),
+          `${ROLE_NAME}${Game.time}`,
+          {
+            memory: { role: ROLE_NAME, task: 0 },
+          }
+        );
+      }
+    });
   },
   /** @param {Creep} creep **/
   run: (creep) => {
