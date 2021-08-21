@@ -19,10 +19,17 @@ const getFreeSquares = (room, sourcePos, swampClear = false) => {
       return false;
     }
 
+    const hasRoad = squareContents.some((item) => {
+      return (
+        item.type === "structure" &&
+        item.structure.structureType === STRUCTURE_ROAD
+      );
+    });
+
     const terrainValue = terrain.get(position.x, position.y);
     switch (terrainValue) {
       case TERRAIN_MASK_WALL:
-        return false;
+        return false || hasRoad;
       case TERRAIN_MASK_SWAMP:
         return swampClear;
       case 0:

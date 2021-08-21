@@ -1,7 +1,33 @@
 const utils = require("./utils");
+const creepUtils = require("./utils/creep");
 
 const ROLE_NAME = "builder";
 const MIN_UNITS = 1;
+
+const buildTarget = (creep) => {
+  const targeta = creep.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES, {
+    filter: (site) => {
+      const look = creep.room.lookAt(site.pos);
+      const isRoad =
+        look.filter(
+          (item) =>
+            item.type === "constructionSite" &&
+            item.constructionSite.structureType === "road"
+        ).length > 0;
+      const isSwamp =
+        look.filter(
+          (item) => item.type === "terrain" && item.terrain === "swamp"
+        ).length > 0;
+      return isRoad && isSwamp;
+    },
+  });
+
+  if (targeta) {
+    return targeta;
+  }
+
+  return creep.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES);
+};
 
 var roleBuilder = {
   spawn: () => {
@@ -22,11 +48,18 @@ var roleBuilder = {
     }
   },
   /** @param {Creep} creep **/
-  run: function (creep) {
+  run: (creep) => {
     // creep.say(`b ${creep.room.energyAvailable}`);
-    // if (creep.room.energyAvailable <= 200 && !creep.memory.building) {
-    //   return;
-    // }
+    const workers = creep.room.find(FIND_MY_CREEPS, {
+      filter: (creepa) => {
+        return creepa.memory.role === "worker";
+      },
+    });
+
+    if (creep.room.energyAvailable <= 200 && workers.length < 1) {
+      creepUtils.getOffTheRoad(creep);
+      return;
+    }
     if (creep.memory.building && creep.store[RESOURCE_ENERGY] == 0) {
       creep.memory.building = false;
     }
@@ -34,7 +67,7 @@ var roleBuilder = {
       creep.memory.building = true;
     }
 
-    const target0 = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+    const target0 = buildTarget(creep);
     const target1 = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
       filter: (structure) => {
         return structure.hitsMax - structure.hits > 0;
@@ -43,29 +76,8 @@ var roleBuilder = {
 
     // If nothing to do, get off the road
     if (!target0 && !target1) {
-      for (let n = 0; n < 10; n++) {
-        const ring = utils.manhattanRing(n, creep.pos);
-        for (const pos of ring) {
-          const squareContents = creep.room.lookAt(pos.x, pos.y);
-          const roads = squareContents.filter(
-            (t) =>
-              t.type === "structure" && t.structure.structureType === "road"
-          );
-          if (roads.length > 0) {
-            break;
-          }
-          const plains = squareContents.filter(
-            (t) => t.type === "terrain" && t.terrain === "plain"
-          );
-          if (plains.length > 0) {
-            creep.room.visual.text("😴", pos.x, pos.y);
-            if (creep.pos.x !== pos.x || creep.pos.y !== pos.y) {
-              creep.moveTo(pos.x, pos.y);
-            }
-            return;
-          }
-        }
-      }
+      creepUtils.getOffTheRoad(creep);
+      return;
     }
 
     if (creep.memory.building) {

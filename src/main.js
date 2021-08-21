@@ -5,6 +5,7 @@ const roleUpgrader = require("./role.upgrader");
 const roleBuilder = require("./role.builder");
 
 const buildingController = require("./buildingController");
+const spawnController = require("./spawnController");
 
 const loop = function () {
   utils.cleanMemory();
@@ -29,6 +30,7 @@ const loop = function () {
   // }
 
   buildingController.build();
+  spawnController.run();
 
   for (const name in Game.creeps) {
     const creep = Game.creeps[name];

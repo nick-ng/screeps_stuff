@@ -52,21 +52,23 @@ const closestDepot = (creep) => {
       },
     })
     .concat(
-      creep.room.find(FIND_MY_CREEPS, {
-        filter: (creep) => {
-          switch (creep.memory.role) {
-            case "builder":
-              return (
-                // creep.room.find(FIND_CONSTRUCTION_SITES).length > 0 &&
-                creep.store.getFreeCapacity() > 0
-              );
-            case "upgrader":
-              return creep.store.getFreeCapacity() > 20;
-            default:
-              return false;
-          }
-        },
-      })
+      creep.room.energyAvailable < 200
+        ? []
+        : creep.room.find(FIND_MY_CREEPS, {
+            filter: (creep) => {
+              switch (creep.memory.role) {
+                case "builder":
+                  return (
+                    // creep.room.find(FIND_CONSTRUCTION_SITES).length > 0 &&
+                    creep.store.getFreeCapacity() > 0
+                  );
+                case "upgrader":
+                  return creep.store.getFreeCapacity() > 20;
+                default:
+                  return false;
+              }
+            },
+          })
     );
 
   const b = goals
@@ -148,8 +150,6 @@ const harvest = (creep) => {
     }
 
     if (creep.memory.subTask === "harvesting") {
-      creep.say("h");
-      // creep.say(creep.memory.source.id);
       const source0 = creep.room.find(FIND_SOURCES, {
         filter: (source) => source.id === creep.memory.source.id,
       })[0];
@@ -165,7 +165,6 @@ const harvest = (creep) => {
       if (repairRoads(creep)) {
         return;
       }
-      creep.say("d");
       const target0 = closestDepot(creep);
 
       if (target0) {

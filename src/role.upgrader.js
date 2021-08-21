@@ -1,12 +1,18 @@
 const utils = require("./utils");
 
 const ROLE_NAME = "upgrader";
-const MIN_UNITS = 3;
+const MIN_UNITS = 1;
 
 var roleUpgrader = {
   roleName: ROLE_NAME,
   spawn: () => {
-    utils.spawn([WORK, CARRY, MOVE], ROLE_NAME, MIN_UNITS, {}, 0);
+    const spawns = Game.spawns;
+    Object.values(spawns).forEach((spawn, i) => {
+      if (spawn.room.energyAvailable <= 200) {
+        return;
+      }
+      utils.spawn([WORK, CARRY, MOVE], ROLE_NAME, MIN_UNITS, {}, i);
+    });
   },
 
   /** @param {Creep} creep **/

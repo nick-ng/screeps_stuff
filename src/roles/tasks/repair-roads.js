@@ -1,7 +1,7 @@
 const searchOptions = {
   filter: (structure) => {
     return (
-      structure.structureType === "road" &&
+      structure.structureType === STRUCTURE_ROAD &&
       structure.hitsMax - structure.hits > 0
     );
   },
