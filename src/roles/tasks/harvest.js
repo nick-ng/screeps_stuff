@@ -142,6 +142,7 @@ const harvest = (creep) => {
       creep.memory.subTask === "delivering" &&
       creep.store[RESOURCE_ENERGY] === 0
     ) {
+      creep.memory.source = null;
       creep.memory.subTask = "harvesting";
     } else if (
       creep.memory.subTask === "harvesting" &&
