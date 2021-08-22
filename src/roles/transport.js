@@ -69,7 +69,7 @@ module.exports = {
       },
     });
 
-    if (extensions.length > 0 && creep.store[RESOURCE_ENERGY] > 0) {
+    if (extensions.length > 0 && creep.store[RESOURCE_ENERGY] >= 50) {
       creep.memory.idle = false;
       const target = closestTarget(creep, extensions);
       if (target) {

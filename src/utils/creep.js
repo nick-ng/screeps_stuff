@@ -10,6 +10,8 @@ const creepCost = (creepBody) =>
 
 const getOffTheRoad = (creep) => {
   creep.memory.idle = true;
+  creep.room.visual.text("😴", creep.pos.x, creep.pos.y);
+  return true;
   for (let n = 0; n < 10; n++) {
     const ring = utils.manhattanRing(n, creep.pos);
     for (const pos of ring) {
