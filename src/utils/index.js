@@ -144,7 +144,7 @@ module.exports = {
           (structure.structureType == STRUCTURE_EXTENSION ||
             structure.structureType == STRUCTURE_SPAWN ||
             structure.structureType == STRUCTURE_TOWER) &&
-          structure.store.getUsedCapacity(RESOURCE_ENERGY) > 0
+          structure.store.getUsedCapacity(RESOURCE_ENERGY) > 5
         );
       },
     }),

@@ -41,6 +41,8 @@ const buildRoads = (room) => {
     }
   }
 
+  return;
+
   if (
     room.find(FIND_STRUCTURES, {
       filter: (structure) => {

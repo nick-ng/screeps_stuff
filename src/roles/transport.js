@@ -70,30 +70,44 @@ module.exports = {
     });
 
     if (extensions.length > 0 && creep.store[RESOURCE_ENERGY] >= 50) {
-      creep.memory.idle = false;
       const target = closestTarget(creep, extensions);
       if (target) {
+        creep.memory.idle = false;
         if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
           creep.moveTo(target, {
             visualizePathStyle: { stroke: "#0000ff" },
           });
         }
+        return;
+      }
+    }
+
+    const drops = creep.room
+      .find(FIND_DROPPED_RESOURCES)
+      .sort((a, b) => (b.energy || 0) - (a.energy || 0));
+    if (drops.length > 0) {
+      creep.memory.idle = false;
+      if (creep.pickup(drops[0]) === ERR_NOT_IN_RANGE) {
+        creep.moveTo(drops[0], {
+          visualizePathStyle: { stroke: "#ff0000" },
+        });
       }
       return;
     }
 
-    if (spawns.length === 0) {
-      return creepUtils.getOffTheRoad(creep);
-    }
-    creep.memory.idle = false;
-
-    const target = closestTarget(creep, spawns);
-    if (target) {
-      if (creep.withdraw(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(target, {
-          visualizePathStyle: { stroke: "#ffffff" },
-        });
+    if (spawns.length > 0) {
+      const target = closestTarget(creep, spawns);
+      if (target) {
+        creep.memory.idle = false;
+        if (creep.withdraw(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+          creep.moveTo(target, {
+            visualizePathStyle: { stroke: "#ffffff" },
+          });
+        }
+        return;
       }
     }
+
+    return creepUtils.getOffTheRoad(creep);
   },
 };

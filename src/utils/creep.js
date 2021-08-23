@@ -61,17 +61,13 @@ const workerBluePrintPart = [WORK, CARRY, MOVE];
 const getWorkerBluePrint = (room) => {
   const workers = getWorkers(room);
   const energyCapacityAvailable = room.energyCapacityAvailable;
-  if (
-    workers.length < 1 ||
-    energyCapacityAvailable < 400 ||
-    room.memory.energyPerTick < 0
-  ) {
+  if (workers.length < 1) {
     return workerBluePrintPart;
   }
 
-  const currentWorkerBluePrint = [];
+  const currentWorkerBluePrint = [...workerBluePrintPart];
 
-  for (let n = 0; n < 3; n++) {
+  for (let n = 0; n < 99; n++) {
     if (
       creepCost(currentWorkerBluePrint.concat(workerBluePrintPart)) >=
       energyCapacityAvailable
