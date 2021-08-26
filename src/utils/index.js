@@ -63,15 +63,18 @@ const squareClear = ({ x, y }, room, options = {}) => {
     if (typeof customObstacleFilter === "function") {
       return customObstacleFilter(item);
     }
+
     return (
       OBSTACLE_OBJECT_TYPES.concat(["constructionSite"]).includes(item.type) ||
-      (item.type === "structure" && item.structureType !== STRUCTURE_ROAD)
+      (item.type === "structure" &&
+        item.structure.structureType !== STRUCTURE_ROAD)
     );
   });
 
   if (hasObstacles) {
     return false;
   }
+
   const terrain = Game.map.getRoomTerrain(room.name);
   switch (terrain.get(x, y)) {
     case TERRAIN_MASK_WALL:
