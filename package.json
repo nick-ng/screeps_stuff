@@ -20,7 +20,7 @@
   "homepage": "https://github.com/nick-ng/screeps_stuff#readme",
   "dependencies": {
     "dotenv": "^10.0.0",
-    "rollup": "^2.56.2",
+    "rollup": "^4.22.4",
     "rollup-plugin-commonjs": "^10.1.0"
   }
 }
